@@ -27,6 +27,8 @@ button:active{transform:translateY(3px);box-shadow:0 1px 0 #c24520}
 #result .card{width:100%;max-width:420px}
 #rtitle{font-size:28px;font-weight:900;text-align:center;margin:0 0 8px}
 .small{font-size:14px;color:#7a6548;text-align:center}
+#qr{display:flex;justify-content:center;margin:10px 0}
+#qr svg{width:min(70vw,260px);height:auto;background:#fff;border-radius:12px;padding:8px}
 </style>
 </head>
 <body>
@@ -39,10 +41,10 @@ button:active{transform:translateY(3px);box-shadow:0 1px 0 #c24520}
       <label for="name">なまえを えらぶ</label>
       <select id="name"></select>
     </div>
-    <div class="card">
+    <div class="card" id="c-create">
       <button id="create">へやを つくる</button>
     </div>
-    <div class="card">
+    <div class="card" id="c-join">
       <label for="joincode">へやばんごう（4けた）</label>
       <input id="joincode" inputmode="numeric" maxlength="4" placeholder="1234">
       <button id="join" class="sub">へやに はいる</button>
@@ -53,6 +55,8 @@ button:active{transform:translateY(3px);box-shadow:0 1px 0 #c24520}
     <div class="card">
       <div class="small">へやばんごう</div>
       <div id="code">----</div>
+      <div id="qr"></div>
+      <div class="small">ほかの ひとは スマホの カメラで この QR を よみとってね</div>
       <button id="copy" class="sub">リンクを おくる・コピー</button>
     </div>
     <div class="card">
@@ -78,6 +82,7 @@ button:active{transform:translateY(3px);box-shadow:0 1px 0 #c24520}
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import {getAuth, signInAnonymously} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
@@ -111,7 +116,14 @@ if(firebaseConfig.apiKey.startsWith("YOUR")){err("Firebase の せっていが �
 
 NAMES.forEach(n=>{const o=document.createElement("option");o.textContent=n;$("name").append(o)});
 const saved=localStorage.getItem("kidsoni-name"); if(saved&&NAMES.includes(saved))$("name").value=saved;
-const qRoom=new URLSearchParams(location.search).get("room"); if(qRoom)$("joincode").value=qRoom;
+const qRoom=new URLSearchParams(location.search).get("room");
+if(qRoom&&/^\d{4}$/.test(qRoom)){
+  $("joincode").value=qRoom;
+  $("c-create").classList.add("hidden");
+  $("joincode").parentElement.querySelector("label").textContent="へやばんごう "+qRoom;
+  $("joincode").classList.add("hidden");
+  $("join").textContent="この へやに はいる！";
+}
 
 let app,db,uid,room,serverOff=0;
 let mode="home", meta=null, players={}, disp={};
@@ -187,7 +199,15 @@ function sync(){
 function toLobby(){
   mode="lobby"; me={x:0,y:0,st:"run"};
   update(ref(db,`rooms/${room}/players/${uid}`),{x:0,y:0,st:"run"});
-  $("result").classList.add("hidden"); show("s-lobby"); $("code").textContent=room;
+  $("result").classList.add("hidden"); show("s-lobby"); $("code").textContent=room; drawQR();
+}
+function drawQR(){
+  const url=location.origin+location.pathname+"?room="+room;
+  const box=$("qr"); box.innerHTML="";
+  try{
+    const qr=qrcode(0,"M"); qr.addData(url); qr.make();
+    box.innerHTML=qr.createSvgTag({cellSize:4,margin:2,scalable:true});
+  }catch(e){box.textContent="（QRが だせなかったよ。したの ボタンで リンクを おくってね）"}
 }
 function renderLobby(){
   const ids=Object.keys(players);
