@@ -2,86 +2,46 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0c0a08">
 <title>おにごっこ だっしゅつ</title>
-<style>
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-body{margin:0;font-family:"Hiragino Maru Gothic ProN","Zen Maru Gothic",system-ui,sans-serif;background:#fff6e0;color:#3b2a1a;display:flex;justify-content:center}
-#app{width:100%;max-width:520px;padding:14px}
-h1{font-size:26px;margin:6px 0 12px;text-align:center}
-.card{background:#fff;border-radius:18px;padding:16px;margin-bottom:12px;box-shadow:0 3px 0 #e8d7b0}
-label{display:block;font-weight:700;margin-bottom:6px}
-select,input{width:100%;font-size:20px;padding:12px;border-radius:12px;border:3px solid #e8c77a;background:#fffdf5;font-family:inherit}
-button{width:100%;font-size:20px;font-weight:700;padding:14px;border:0;border-radius:14px;background:#ff6a3d;color:#fff;box-shadow:0 4px 0 #c24520;margin-top:10px;font-family:inherit}
-button.sub{background:#4aa8e8;box-shadow:0 4px 0 #2b78ae}
-button:disabled{opacity:.4}
-button.on{background:#2fb344;box-shadow:0 4px 0 #1f7d2f}
-#plist li.ok{background:#c9f2cf;font-weight:700}
-button:active{transform:translateY(3px);box-shadow:0 1px 0 #c24520}
-.hidden{display:none!important}
-#code{font-size:48px;font-weight:900;text-align:center;letter-spacing:8px;color:#ff6a3d}
-#plist{list-style:none;padding:0;margin:8px 0;font-size:20px}
-#plist li{padding:6px 10px;margin:4px 0;background:#fff3c8;border-radius:10px}
-#err{color:#d12;font-weight:700;text-align:center;min-height:22px}
-#hud{display:flex;justify-content:space-between;font-size:20px;font-weight:900;margin-bottom:6px}
-#cv{width:100%;aspect-ratio:1/1;display:block;border-radius:16px;touch-action:none;background:#fdf1cf}
-#result{position:fixed;inset:0;background:rgba(40,25,10,.78);display:flex;align-items:center;justify-content:center;padding:18px}
-#result .card{width:100%;max-width:420px}
-#rtitle{font-size:28px;font-weight:900;text-align:center;margin:0 0 8px}
-.small{font-size:14px;color:#7a6548;text-align:center}
-#qr{display:flex;justify-content:center;margin:10px 0}
-#qr svg{width:min(70vw,260px);height:auto;background:#fff;border-radius:12px;padding:8px}
-</style>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Zen+Maru+Gothic:wght@500;700;900&display=swap">
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
-<div id="app">
-  <h1>👹 おにごっこ だっしゅつ</h1>
-  <div id="err"></div>
+<main>
+  <h1 class="title" id="title">おにごっこ<span>だっしゅつ</span></h1>
+  <p id="message"></p>
 
   <section id="s-home">
-    <div class="card">
-      <label for="name">なまえを えらぶ</label>
+    <div class="panel">
+      <label for="name" style="margin-top:0">なまえを えらぶ</label>
       <select id="name"></select>
-    </div>
-    <div class="card" id="c-create">
       <button id="create">へやを つくる</button>
-    </div>
-    <div class="card hidden" id="c-join">
+      <button id="join" hidden>この へやに はいる！</button>
       <input id="joincode" type="hidden">
-      <button id="join" class="sub">へやに はいる</button>
     </div>
   </section>
 
-  <section id="s-lobby" class="hidden">
-    <div class="card">
-      <div class="small">みんなを よぼう！</div>
+  <section id="s-lobby" hidden>
+    <div class="panel">
+      <h2>みんなを よぼう！</h2>
       <div id="qr"></div>
-      <div class="small">ほかの ひとは スマホの カメラで この QR を よみとってね</div>
-      <button id="copy" class="sub">リンクを おくる・コピー</button>
+      <p class="hint">ほかの ひとは スマホの カメラで この QR を よみとってね</p>
+      <button id="copy" class="secondary">リンクを おくる・コピー</button>
     </div>
-    <div class="card">
-      <label>いる ひと（2〜6にん）</label>
+    <div class="panel">
+      <h2>いる ひと（2〜6にん）</h2>
       <ul id="plist"></ul>
-      <button id="ready" class="sub">じゅんび OK！</button>
+      <button id="ready">じゅんび OK！</button>
       <button id="start">スタート！</button>
-      <div class="small">みんなが じゅんび OK に なったら スタート！ おには ランダムで きまるよ。おにから にげて、みぎしたの 🚪 に はいれば だっしゅつ！</div>
+      <p class="hint" id="starthint"></p>
     </div>
   </section>
 
-  <section id="s-game" class="hidden">
-    <div id="hud"><span id="role"></span><span id="timer"></span></div>
-    <canvas id="cv"></canvas>
-    <div class="small">がめんを ゆびで なぞると うごくよ</div>
-  </section>
-</div>
-
-<div id="result" class="hidden">
-  <div class="card">
-    <p id="rtitle"></p>
-    <ul id="rlist" style="list-style:none;padding:0;font-size:20px"></ul>
-    <button id="again">もういちど</button>
-  </div>
-</div>
+  <section id="s-game" hidden><div id="game"></div></section>
+</main>
 
 <script>
 //---------------------------------------------------------------------
@@ -2386,9 +2346,9 @@ var qrcode = function() {
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import {getAuth, signInAnonymously} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import {getDatabase, ref, set, get, update, onValue, onDisconnect} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+import {getDatabase, ref, set, get, update, onValue, onDisconnect} from "./fb.js";
+import {attachOni} from "./oni.js";
 
-// ===== ここに Firebase の設定を貼る（README を見てね） =====
 const firebaseConfig = {
   apiKey: "AIzaSyDWLAt9kGjcCfVKQEzPPgLm8LwNrxC-Wpc",
   authDomain: "kids-oni.firebaseapp.com",
@@ -2398,306 +2358,106 @@ const firebaseConfig = {
   messagingSenderId: "990393071440",
   appId: "1:990393071440:web:df98bf57c7415a7d749e55"
 };
-// ==========================================================
 
 const NAMES=["ぱぱ","まま","ユナモン","あーちゃん"];
-const W=1000, R=16, RO=22;                 // フィールド、にげる人の半径、おにの半径
-const SPEED_RUN=200, SPEED_ONI=240;        // 1秒で進む量（おには にげる人の1.2ばい）
-const TIME=60, FREEZE=3, ROUL=5, CD=3, COUNT=ROUL+CD;   // せいげん時間、おにの足止め、ルーレット(秒)、カウントダウン(秒)
-const WALLS=[[300,200,40,300],[600,500,40,300],[200,700,300,40],[650,150,250,40],[450,350,150,40]];
-const EXIT=[880,880,120,120];
-const COLORS=["#4aa8e8","#7bc74d","#f2b630","#b573e0","#ff8fb1","#38c6b4"];
-
 const $=id=>document.getElementById(id);
-const show=id=>{for(const s of ["s-home","s-lobby","s-game"])$(s).classList.toggle("hidden",s!==id)};
-const err=t=>{$("err").textContent=t||""};
-
-if(firebaseConfig.apiKey.startsWith("YOUR")){err("Firebase の せっていが まだだよ（README を みてね）");}
+const show=id=>{for(const s of ["s-home","s-lobby","s-game"])$(s).hidden=s!==id};
+const msg=t=>{$("message").textContent=t||""};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 
 NAMES.forEach(n=>{const o=document.createElement("option");o.textContent=n;$("name").append(o)});
 const saved=localStorage.getItem("kidsoni-name"); if(saved&&NAMES.includes(saved))$("name").value=saved;
 const qRoom=new URLSearchParams(location.search).get("room");
 if(qRoom&&/^\d{4}$/.test(qRoom)){
   $("joincode").value=qRoom;
-  $("c-create").classList.add("hidden");
-  $("c-join").classList.remove("hidden");
-  $("join").textContent="この へやに はいる！";
+  $("create").hidden=true; $("join").hidden=false;
 }
 
-let app,db,uid,room,serverOff=0;
-let mode="home", meta=null, players={}, disp={};
-let me={x:0,y:0,st:"run"}, playedRound=-1, startAt=0, oniUid=null, roster=[], lastSend=0, lastFrame=0;
-const unsubs=[];
-const nowS=()=>Date.now()+serverOff;
-
-async function boot(){
+let db,uid,room,meta=null,players={},mounted=false;
+const boot=(async()=>{
   try{
-    app=initializeApp(firebaseConfig);
-    const auth=getAuth(app);
-    const cred=await signInAnonymously(auth);
-    uid=cred.user.uid;
+    const app=initializeApp(firebaseConfig);
+    uid=(await signInAnonymously(getAuth(app))).user.uid;
     db=getDatabase(app);
-    onValue(ref(db,".info/serverTimeOffset"),s=>{serverOff=s.val()||0});
-  }catch(e){err("つながらなかった: "+e.code)}
-}
-const ready=boot();
+  }catch(e){msg("つながらなかった: "+(e.code||e.message))}
+})();
 
-// ---------- へや ----------
 async function createRoom(){
-  await ready; if(!db)return;
-  err("");
+  await boot; if(!db)return; msg("");
   try{
     for(let i=0;i<5;i++){
       const code=String(1000+Math.floor(Math.random()*9000));
       const s=await get(ref(db,`rooms/${code}/meta`));
       if(!s.exists()){
-        await set(ref(db,`rooms/${code}/meta`),{state:"lobby",round:0});
+        await set(ref(db,`oni/${code}`),null).catch(()=>{});
+        await set(ref(db,`rooms/${code}/meta`),{state:"lobby",round:0,hostUid:uid});
         return joinRoom(code);
       }
     }
-    err("もういちど おしてね");
-  }catch(e){err("つくれなかった: "+e.code)}
+    msg("もういちど おしてね");
+  }catch(e){msg("つくれなかった: "+(e.code||e.message))}
 }
 async function joinRoom(code){
-  await ready; if(!db)return;
-  err("");
+  await boot; if(!db)return; msg("");
   try{
     const ms=await get(ref(db,`rooms/${code}/meta`));
-    if(!ms.exists()) return err("へやが みつからないよ");
-    if(ms.val().state!=="lobby") return err("もう はじまっているよ");
+    if(!ms.exists()) return msg("へやが みつからないよ");
+    if(ms.val().state!=="lobby") return msg("もう はじまっているよ");
     const ps=await get(ref(db,`rooms/${code}/players`));
-    const cnt=ps.exists()?Object.keys(ps.val()).length:0;
-    if(cnt>=6 && !(ps.val()||{})[uid]) return err("まんいんだよ（6にんまで）");
+    const cur=ps.exists()?ps.val():{};
+    if(Object.keys(cur).length>=6 && !cur[uid]) return msg("まんいんだよ（6にんまで）");
     room=code;
     const nm=$("name").value; localStorage.setItem("kidsoni-name",nm);
     const pref=ref(db,`rooms/${room}/players/${uid}`);
-    await set(pref,{name:nm,x:0,y:0,st:"run",ready:false});
+    await set(pref,{name:nm,ready:false,joinedAt:Date.now()});
     onDisconnect(pref).remove();
-    unsubs.push(onValue(ref(db,`rooms/${room}/meta`),s=>{meta=s.val();sync()}));
-    unsubs.push(onValue(ref(db,`rooms/${room}/players`),s=>{players=s.val()||{};sync()}));
-  }catch(e){err("はいれなかった: "+e.code)}
+    onValue(ref(db,`rooms/${room}/meta`),s=>{meta=s.val();sync()});
+    onValue(ref(db,`rooms/${room}/players`),s=>{players=s.val()||{};sync()});
+  }catch(e){msg("はいれなかった: "+(e.code||e.message))}
 }
 $("create").onclick=createRoom;
-$("join").onclick=()=>{const c=$("joincode").value.trim(); if(c.length!==4)return err("QRを よみとりなおしてね"); joinRoom(c)};
+$("join").onclick=()=>joinRoom($("joincode").value.trim());
+
 $("copy").onclick=async()=>{
   const url=location.origin+location.pathname+"?room="+room;
   try{ if(navigator.share) await navigator.share({title:"おにごっこ",text:"いっしょに あそぼう！",url}); else {await navigator.clipboard.writeText(url);$("copy").textContent="コピーしたよ！"} }catch(e){}
 };
-$("ready").onclick=()=>{err("");update(ref(db,`rooms/${room}/players/${uid}`),{ready:!(players[uid]&&players[uid].ready)}).catch(e=>err("じゅんびが おくれなかった: "+(e.code||e.message)))};
-$("start").onclick=()=>{
-  const ids=Object.keys(players); if(ids.length<2||!ids.every(i=>players[i].ready))return;
-  const oni=ids[Math.floor(Math.random()*ids.length)];
-  update(ref(db,`rooms/${room}/meta`),{state:"play",oni,startAt:nowS()+COUNT*1000,round:(meta.round||0)+1});
-};
-$("again").onclick=()=>update(ref(db,`rooms/${room}/meta`),{state:"lobby"});
-
-function sync(){
-  if(!meta)return;
-  if(meta.state==="lobby"){ if(mode!=="lobby")toLobby(); renderLobby(); }
-  else if(meta.state==="play" && meta.round!==playedRound){ startGame(); }
-}
-function toLobby(){
-  mode="lobby"; me={x:0,y:0,st:"run"};
-  update(ref(db,`rooms/${room}/players/${uid}`),{x:0,y:0,st:"run",ready:false});
-  $("result").classList.add("hidden"); show("s-lobby"); drawQR();
-}
-function drawQR(){
-  const url=location.origin+location.pathname+"?room="+room;
-  const box=$("qr"); box.innerHTML="";
-  try{
-    const qr=qrcode(0,"M"); qr.addData(url); qr.make();
-    box.innerHTML=qr.createSvgTag({cellSize:4,margin:2,scalable:true});
-  }catch(e){box.textContent="（QRが だせなかったよ。したの ボタンで リンクを おくってね）"}
-}
-function renderLobby(){
+$("ready").onclick=()=>{msg("");update(ref(db,`rooms/${room}/players/${uid}`),{ready:!(players[uid]&&players[uid].ready)}).catch(e=>msg("じゅんびが おくれなかった: "+(e.code||e.message)))};
+$("start").onclick=async()=>{
   const ids=Object.keys(players);
-  $("plist").innerHTML=ids.map(i=>`<li class="${players[i].ready?"ok":""}">${players[i].ready?"✅ ":(i===uid?"👉 ":"🙂 ")}${esc(players[i].name)}${players[i].ready?"　じゅんび OK":""}</li>`).join("");
-  const mine=!!(players[uid]&&players[uid].ready), all=ids.length>=2&&ids.every(i=>players[i].ready);
+  if(!meta||meta.hostUid!==uid||ids.length<2||!ids.every(i=>players[i].ready))return;
+  try{
+    await set(ref(db,`oni/${room}`),null);
+    await update(ref(db,`rooms/${room}/meta`),{state:"play"});
+  }catch(e){msg("はじめられなかった: "+(e.code||e.message))}
+};
+
+function drawQR(){
+  const url=location.origin+location.pathname+"?room="+room, box=$("qr"); box.innerHTML="";
+  try{ const q=qrcode(0,"M"); q.addData(url); q.make(); box.innerHTML=q.createSvgTag({cellSize:4,margin:2,scalable:true}); }
+  catch(e){box.textContent="（QRが だせなかったよ。したの ボタンで リンクを おくってね）"}
+}
+let lobbyShown=false;
+function renderLobby(){
+  if(!lobbyShown){lobbyShown=true;show("s-lobby");drawQR();}
+  const ids=Object.keys(players).sort((a,b)=>(players[a].joinedAt||0)-(players[b].joinedAt||0)||a.localeCompare(b));
+  $("plist").innerHTML=ids.map(i=>{const p=players[i];return `<li class="${p.ready?"ok":""}">${p.ready?"✅ ":"🙂 "}${esc(p.name)}${i===meta.hostUid?"（ホスト）":""}${p.ready?"　じゅんび OK":""}</li>`}).join("");
+  const mine=!!(players[uid]&&players[uid].ready), all=ids.length>=2&&ids.every(i=>players[i].ready), isHost=meta.hostUid===uid;
   $("ready").textContent=mine?"✅ じゅんび OK！（おすと とりけし）":"じゅんび OK！";
   $("ready").classList.toggle("on",mine);
+  $("start").hidden=!isHost;
   $("start").disabled=!all;
+  $("starthint").textContent=isHost?(all?"みんな じゅんび OK！ スタートを おしてね":"みんなが じゅんび OK に なったら スタート！"):"ホストが スタートを おすのを まってね";
 }
-const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-
-// ---------- ゲーム ----------
-function startGame(){
-  playedRound=meta.round; oniUid=meta.oni; startAt=meta.startAt; mode="play";
-  roster=Object.keys(players).sort(); disp={};
-  const runners=roster.filter(i=>i!==oniUid);
-  if(uid===oniUid){me={x:500,y:520,st:"run"}}
-  else{const k=runners.indexOf(uid);me={x:60,y:80+k*140,st:"run"}}
-  lastSend=0; lastFrame=performance.now();
-  send(true);
-  show("s-game"); $("result").classList.add("hidden");
-  $("role").textContent="🎰 おにを きめているよ…";
-  resize(); requestAnimationFrame(loop);
-}
-function send(force){
-  const t=performance.now();
-  if(!force && t-lastSend<100)return; lastSend=t;
-  update(ref(db,`rooms/${room}/players/${uid}`),{x:Math.round(me.x),y:Math.round(me.y),st:me.st});
-}
-
-const cv=$("cv"), ctx=cv.getContext("2d");
-let scale=1;
-function resize(){
-  const s=Math.min($("app").clientWidth-28,520); const d=window.devicePixelRatio||1;
-  cv.width=cv.height=Math.round(s*d); scale=cv.width/W;
-}
-addEventListener("resize",()=>{if(mode==="play"||mode==="result")resize()});
-
-// そうさ
-let drag=null, vec={x:0,y:0}; const keys={};
-cv.addEventListener("pointerdown",e=>{drag={x:e.clientX,y:e.clientY};vec={x:0,y:0};cv.setPointerCapture(e.pointerId)});
-cv.addEventListener("pointermove",e=>{if(!drag)return;const dx=e.clientX-drag.x,dy=e.clientY-drag.y,l=Math.hypot(dx,dy);vec=l>8?{x:dx/l,y:dy/l}:{x:0,y:0}; if(l>60){drag.x=e.clientX-dx/l*60;drag.y=e.clientY-dy/l*60}});
-const endDrag=()=>{drag=null;vec={x:0,y:0}};
-cv.addEventListener("pointerup",endDrag); cv.addEventListener("pointercancel",endDrag);
-addEventListener("keydown",e=>keys[e.key]=true); addEventListener("keyup",e=>keys[e.key]=false);
-function inputVec(){
-  let x=vec.x,y=vec.y;
-  if(keys.ArrowLeft||keys.a)x-=1; if(keys.ArrowRight||keys.d)x+=1;
-  if(keys.ArrowUp||keys.w)y-=1; if(keys.ArrowDown||keys.s)y+=1;
-  const l=Math.hypot(x,y); return l>1?{x:x/l,y:y/l}:{x,y};
-}
-
-function hits(x,y,r){
-  if(x<r||y<r||x>W-r||y>W-r)return true;
-  for(const [rx,ry,rw,rh] of WALLS){
-    const cx=Math.max(rx,Math.min(x,rx+rw)), cy=Math.max(ry,Math.min(y,ry+rh));
-    if(Math.hypot(x-cx,y-cy)<r)return true;
+function sync(){
+  if(!meta||mounted)return;
+  if(meta.state==="lobby"){ if(players[uid]) renderLobby(); }
+  else if(meta.state==="play"&&players[uid]){
+    mounted=true; show("s-game"); $("title").hidden=true;
+    const ids=Object.keys(players).sort((a,b)=>(players[a].joinedAt||0)-(players[b].joinedAt||0)||a.localeCompare(b));
+    const list=ids.map((u,i)=>({uid:u,name:players[u].name,slot:i}));
+    attachOni({db,roomId:room,uid,players:list,hostUid:meta.hostUid||ids[0],message:msg,root:$("game")});
   }
-  return false;
-}
-function step(dt){
-  const v=inputVec(); const isOni=uid===oniUid;
-  const sp=(isOni?SPEED_ONI:SPEED_RUN)*dt, r=isOni?RO:R;
-  const nx=me.x+v.x*sp; if(!hits(nx,me.y,r))me.x=nx;
-  const ny=me.y+v.y*sp; if(!hits(me.x,ny,r))me.y=ny;
-}
-
-function loop(t){
-  if(mode!=="play"&&mode!=="result")return;
-  const dt=Math.min(0.05,(t-lastFrame)/1000); lastFrame=t;
-  const now=nowS(), el=(now-startAt)/1000;
-
-  if(mode==="play"){
-    const isOni=uid===oniUid;
-    if(el>=0){
-      const canMove=me.st==="run" && !(isOni && el<FREEZE);
-      if(canMove)step(dt);
-      if(!isOni && me.st==="run"){
-        const o=players[oniUid];
-        if(o && Math.hypot(o.x-me.x,o.y-me.y)<R+RO-4){me.st="caught";send(true)}
-        else if(me.x>EXIT[0]&&me.y>EXIT[1]){me.st="escaped";send(true)}
-      }
-      send();
-    }
-    // おわり判定
-    if(el>=0){
-      const runners=roster.filter(i=>i!==oniUid&&players[i]);
-      const active=runners.filter(i=>(i===uid?me.st:players[i].st)==="run");
-      const oniGone=!players[oniUid];
-      if(el>=TIME||active.length===0||oniGone){finish(oniGone);}
-    }
-    $("role").textContent=el<-CD?"🎰 おにを きめているよ…":(uid===oniUid?"👹 きみは おに！":"🏃 にげろ！ 🚪へ！");
-    $("timer").textContent=el<0?"⏳":"⏱ "+Math.max(0,Math.ceil(TIME-el));
-  }
-  draw(el);
-  requestAnimationFrame(loop);
-}
-
-function finish(oniGone){
-  mode="result"; send(true);
-  const runners=roster.filter(i=>i!==oniUid&&players[i]);
-  const st=i=>i===uid?me.st:players[i].st;
-  const esc_=runners.filter(i=>st(i)==="escaped").length;
-  $("rtitle").textContent=oniGone?"おにが いなくなった！":(esc_>0?`🎉 ${esc_}にん だっしゅつ！`:"👹 おにの かち！");
-  const mark=s=>s==="escaped"?"🚪 だっしゅつ！":s==="caught"?"😱 つかまった":"⏰ じかんぎれ";
-  $("rlist").innerHTML=
-    `<li>👹 ${esc(players[oniUid]?players[oniUid].name:"おに")}（おに）</li>`+
-    runners.map(i=>`<li>${esc(players[i].name)}　${mark(st(i))}</li>`).join("");
-  $("result").classList.remove("hidden");
-}
-
-function draw(el){
-  const c=ctx, s=scale; c.setTransform(1,0,0,1,0,0); c.clearRect(0,0,cv.width,cv.height);
-  c.fillStyle="#fdf1cf"; c.fillRect(0,0,cv.width,cv.height);
-  c.scale(s,s);
-  // 出口
-  c.fillStyle="#7ad6c4"; c.fillRect(...EXIT);
-  c.font="64px sans-serif"; c.textAlign="center"; c.textBaseline="middle"; c.fillText("🚪",EXIT[0]+60,EXIT[1]+62);
-  // かべ
-  c.fillStyle="#9a7b57"; for(const w of WALLS)c.fillRect(...w);
-  // キャラ
-  for(const id of roster){
-    const p=players[id]; if(!p&&id!==uid)continue;
-    let x,y,st;
-    if(id===uid){x=me.x;y=me.y;st=me.st}
-    else{
-      const d=disp[id]||(disp[id]={x:p.x,y:p.y});
-      d.x+=(p.x-d.x)*0.35; d.y+=(p.y-d.y)*0.35; x=d.x;y=d.y;st=p.st;
-    }
-    if(st==="escaped")continue;
-    const isOni=id===oniUid, col=isOni?"#e8412e":COLORS[roster.indexOf(id)%COLORS.length];
-    c.globalAlpha=st==="caught"?0.35:1;
-    drawChar(x,y,isOni,col,id===uid,p?p.name:"");
-    c.globalAlpha=1;
-  }
-  // カウントダウン
-  c.textAlign="center"; c.textBaseline="middle";
-  if(el<-CD){
-    drawRoulette(el);
-  }else if(el<0){
-    c.fillStyle="rgba(0,0,0,.45)"; c.fillRect(0,0,W,W);
-    c.fillStyle="#fff"; c.font="bold 200px sans-serif"; c.fillText(String(Math.ceil(-el)),W/2,W/2+40);
-    c.font="bold 60px sans-serif"; c.fillStyle="#ffd400";
-    c.fillText("おには "+(players[oniUid]?players[oniUid].name:"？")+"！",W/2,170);
-  }else if(el<FREEZE && mode==="play"){
-    c.fillStyle="#fff"; c.strokeStyle="#3b2a1a"; c.lineWidth=8; c.font="bold 54px sans-serif";
-    const t=uid===oniUid?`おには あと ${Math.ceil(FREEZE-el)}びょう まってね`:`いまのうちに にげて！`;
-    c.strokeText(t,W/2,70); c.fillText(t,W/2,70);
-  }
-}
-function drawRoulette(el){
-  const c=ctx, n=roster.length, idx=Math.max(0,roster.indexOf(oniUid));
-  const u=Math.min(1,Math.max(0,(el+COUNT)/ROUL));
-  const S=n*4+idx, pos=Math.floor(S*(1-Math.pow(1-u,3))), hi=pos%n;
-  c.fillStyle="rgba(40,25,10,.88)"; c.fillRect(0,0,W,W);
-  c.textAlign="center"; c.textBaseline="middle";
-  c.fillStyle="#ffd400"; c.font="bold 72px sans-serif"; c.fillText("🎰 おにを きめるよ！",W/2,120);
-  const rowH=Math.min(110,640/n), y0=500-(n*rowH)/2+rowH/2;
-  for(let i=0;i<n;i++){
-    const y=y0+i*rowH, on=i===hi, nm=players[roster[i]]?players[roster[i]].name:"？";
-    if(on){c.fillStyle=u>=1?"#e8412e":"#ffd400";c.beginPath();c.roundRect(150,y-rowH*0.42,700,rowH*0.84,24);c.fill()}
-    c.fillStyle=on?(u>=1?"#fff":"#3b2a1a"):"#fff7e0"; c.font="bold "+Math.round(rowH*0.55)+"px sans-serif";
-    c.fillText((on&&u>=1?"👹 ":"")+nm,W/2,y);
-  }
-}
-function drawChar(x,y,isOni,col,isMe,name){
-  const c=ctx, r=isOni?RO:R;
-  if(isMe){c.beginPath();c.arc(x,y,r+8,0,7);c.strokeStyle="#ffd400";c.lineWidth=5;c.stroke()}
-  c.beginPath();c.arc(x,y,r,0,7);c.fillStyle=col;c.fill();
-  c.lineWidth=3;c.strokeStyle="#3b2a1a";c.stroke();
-  if(isOni){ // つの
-    c.fillStyle="#fff7c0";
-    for(const sx of [-1,1]){c.beginPath();c.moveTo(x+sx*6,y-r+4);c.lineTo(x+sx*14,y-r-14);c.lineTo(x+sx*16,y-r+6);c.closePath();c.fill();c.stroke()}
-  }
-  // め
-  c.fillStyle="#fff";
-  for(const sx of [-1,1]){c.beginPath();c.arc(x+sx*r*0.38,y-r*0.15,r*0.22,0,7);c.fill()}
-  c.fillStyle="#222";
-  for(const sx of [-1,1]){c.beginPath();c.arc(x+sx*r*0.38,y-r*0.15,r*0.1,0,7);c.fill()}
-  if(isOni){ // いかりまゆ と きば
-    c.strokeStyle="#222";c.lineWidth=3;
-    for(const sx of [-1,1]){c.beginPath();c.moveTo(x+sx*r*0.7,y-r*0.55);c.lineTo(x+sx*r*0.12,y-r*0.35);c.stroke()}
-    c.fillStyle="#fff";
-    for(const sx of [-1,1]){c.beginPath();c.moveTo(x+sx*7,y+r*0.35);c.lineTo(x+sx*3,y+r*0.35+9);c.lineTo(x+sx*11,y+r*0.35);c.fill()}
-  }else{
-    c.strokeStyle="#222";c.lineWidth=2.5;c.beginPath();c.arc(x,y+r*0.15,r*0.3,0.15*Math.PI,0.85*Math.PI);c.stroke();
-  }
-  c.font="bold 22px sans-serif";c.textAlign="center";c.textBaseline="alphabetic";
-  c.lineWidth=5;c.strokeStyle="#fff";c.fillStyle="#3b2a1a";
-  c.strokeText(name,x,y-r-(isOni?20:10));c.fillText(name,x,y-r-(isOni?20:10));
 }
 </script>
 </body>

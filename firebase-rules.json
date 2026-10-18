@@ -19,6 +19,9 @@
           },
           "$other": {
             ".validate": false
+          },
+          "hostUid": {
+            ".validate": "newData.isString() && newData.val().length < 40"
           }
         },
         "players": {
@@ -42,11 +45,25 @@
             },
             "ready": {
               ".validate": "newData.isBoolean()"
+            },
+            "joinedAt": {
+              ".validate": "newData.isNumber()"
             }
           }
         },
         "$other": {
           ".validate": false
+        }
+      }
+    },
+    "oni": {
+      "$room": {
+        ".read": "auth != null",
+        ".write": "auth != null",
+        "pos": {
+          "$id": {
+            ".validate": "newData.hasChildren(['x','y']) && newData.child('x').isNumber() && newData.child('x').val() >= 0 && newData.child('x').val() <= 7 && newData.child('y').isNumber() && newData.child('y').val() >= 0 && newData.child('y').val() <= 7"
+          }
         }
       }
     }
