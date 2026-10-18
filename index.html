@@ -15,6 +15,8 @@ select,input{width:100%;font-size:20px;padding:12px;border-radius:12px;border:3p
 button{width:100%;font-size:20px;font-weight:700;padding:14px;border:0;border-radius:14px;background:#ff6a3d;color:#fff;box-shadow:0 4px 0 #c24520;margin-top:10px;font-family:inherit}
 button.sub{background:#4aa8e8;box-shadow:0 4px 0 #2b78ae}
 button:disabled{opacity:.4}
+button.on{background:#2fb344;box-shadow:0 4px 0 #1f7d2f}
+#plist li.ok{background:#c9f2cf;font-weight:700}
 button:active{transform:translateY(3px);box-shadow:0 1px 0 #c24520}
 .hidden{display:none!important}
 #code{font-size:48px;font-weight:900;text-align:center;letter-spacing:8px;color:#ff6a3d}
@@ -2481,7 +2483,7 @@ $("copy").onclick=async()=>{
   const url=location.origin+location.pathname+"?room="+room;
   try{ if(navigator.share) await navigator.share({title:"おにごっこ",text:"いっしょに あそぼう！",url}); else {await navigator.clipboard.writeText(url);$("copy").textContent="コピーしたよ！"} }catch(e){}
 };
-$("ready").onclick=()=>update(ref(db,`rooms/${room}/players/${uid}`),{ready:!(players[uid]&&players[uid].ready)});
+$("ready").onclick=()=>{err("");update(ref(db,`rooms/${room}/players/${uid}`),{ready:!(players[uid]&&players[uid].ready)}).catch(e=>err("じゅんびが おくれなかった: "+(e.code||e.message)))};
 $("start").onclick=()=>{
   const ids=Object.keys(players); if(ids.length<2||!ids.every(i=>players[i].ready))return;
   const oni=ids[Math.floor(Math.random()*ids.length)];
@@ -2509,9 +2511,10 @@ function drawQR(){
 }
 function renderLobby(){
   const ids=Object.keys(players);
-  $("plist").innerHTML=ids.map(i=>`<li>${players[i].ready?"✅ ":(i===uid?"👉 ":"🙂 ")}${esc(players[i].name)}${players[i].ready?"　じゅんび OK":""}</li>`).join("");
+  $("plist").innerHTML=ids.map(i=>`<li class="${players[i].ready?"ok":""}">${players[i].ready?"✅ ":(i===uid?"👉 ":"🙂 ")}${esc(players[i].name)}${players[i].ready?"　じゅんび OK":""}</li>`).join("");
   const mine=!!(players[uid]&&players[uid].ready), all=ids.length>=2&&ids.every(i=>players[i].ready);
-  $("ready").textContent=mine?"じゅんび やめる":"じゅんび OK！";
+  $("ready").textContent=mine?"✅ じゅんび OK！（おすと とりけし）":"じゅんび OK！";
+  $("ready").classList.toggle("on",mine);
   $("start").disabled=!all;
 }
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
