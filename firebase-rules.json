@@ -1,0 +1,54 @@
+{
+  "rules": {
+    "rooms": {
+      "$room": {
+        ".read": "auth != null",
+        "meta": {
+          ".write": "auth != null && (!data.exists() || root.child('rooms').child($room).child('players').child(auth.uid).exists())",
+          "state": {
+            ".validate": "newData.val() === 'lobby' || newData.val() === 'play'"
+          },
+          "round": {
+            ".validate": "newData.isNumber()"
+          },
+          "oni": {
+            ".validate": "newData.isString() && newData.val().length < 40"
+          },
+          "startAt": {
+            ".validate": "newData.isNumber()"
+          },
+          "$other": {
+            ".validate": false
+          }
+        },
+        "players": {
+          "$uid": {
+            ".write": "auth != null && auth.uid === $uid",
+            ".validate": "newData.child('name').isString() && newData.child('name').val().length <= 10",
+            "name": {
+              ".validate": "newData.isString()"
+            },
+            "x": {
+              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 1000"
+            },
+            "y": {
+              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 1000"
+            },
+            "st": {
+              ".validate": "newData.val() === 'run' || newData.val() === 'caught' || newData.val() === 'escaped'"
+            },
+            "$other": {
+              ".validate": false
+            },
+            "ready": {
+              ".validate": "newData.isBoolean()"
+            }
+          }
+        },
+        "$other": {
+          ".validate": false
+        }
+      }
+    }
+  }
+}

@@ -60,8 +60,9 @@ button:active{transform:translateY(3px);box-shadow:0 1px 0 #c24520}
     <div class="card">
       <label>いる ひと（2〜6にん）</label>
       <ul id="plist"></ul>
+      <button id="ready" class="sub">じゅんび OK！</button>
       <button id="start">スタート！</button>
-      <div class="small">おには ランダムで きまるよ。おにから にげて、みぎしたの 🚪 に はいれば だっしゅつ！</div>
+      <div class="small">みんなが じゅんび OK に なったら スタート！ おには ランダムで きまるよ。おにから にげて、みぎしたの 🚪 に はいれば だっしゅつ！</div>
     </div>
   </section>
 
@@ -2397,7 +2398,7 @@ const firebaseConfig = {
 };
 // ==========================================================
 
-const NAMES=["パパ","ママ","じいじ","ばあば","おにいちゃん","おねえちゃん","いもうと","おとうと","ゆうた","はると","そうた","れん","あおい","ひなた","さくら","めい","ゆい","りお"];
+const NAMES=["ぱぱ","まま","ユナモン","あーちゃん"];
 const W=1000, R=16, RO=22;                 // フィールド、にげる人の半径、おにの半径
 const SPEED_RUN=200, SPEED_ONI=190;        // 1秒で進む量
 const TIME=60, FREEZE=3, COUNT=4;          // せいげん時間、おにの足止め、カウントダウン(秒)
@@ -2468,7 +2469,7 @@ async function joinRoom(code){
     room=code;
     const nm=$("name").value; localStorage.setItem("kidsoni-name",nm);
     const pref=ref(db,`rooms/${room}/players/${uid}`);
-    await set(pref,{name:nm,x:0,y:0,st:"run"});
+    await set(pref,{name:nm,x:0,y:0,st:"run",ready:false});
     onDisconnect(pref).remove();
     unsubs.push(onValue(ref(db,`rooms/${room}/meta`),s=>{meta=s.val();sync()}));
     unsubs.push(onValue(ref(db,`rooms/${room}/players`),s=>{players=s.val()||{};sync()}));
@@ -2480,8 +2481,9 @@ $("copy").onclick=async()=>{
   const url=location.origin+location.pathname+"?room="+room;
   try{ if(navigator.share) await navigator.share({title:"おにごっこ",text:"いっしょに あそぼう！",url}); else {await navigator.clipboard.writeText(url);$("copy").textContent="コピーしたよ！"} }catch(e){}
 };
+$("ready").onclick=()=>update(ref(db,`rooms/${room}/players/${uid}`),{ready:!(players[uid]&&players[uid].ready)});
 $("start").onclick=()=>{
-  const ids=Object.keys(players); if(ids.length<2)return;
+  const ids=Object.keys(players); if(ids.length<2||!ids.every(i=>players[i].ready))return;
   const oni=ids[Math.floor(Math.random()*ids.length)];
   update(ref(db,`rooms/${room}/meta`),{state:"play",oni,startAt:nowS()+COUNT*1000,round:(meta.round||0)+1});
 };
@@ -2494,7 +2496,7 @@ function sync(){
 }
 function toLobby(){
   mode="lobby"; me={x:0,y:0,st:"run"};
-  update(ref(db,`rooms/${room}/players/${uid}`),{x:0,y:0,st:"run"});
+  update(ref(db,`rooms/${room}/players/${uid}`),{x:0,y:0,st:"run",ready:false});
   $("result").classList.add("hidden"); show("s-lobby"); drawQR();
 }
 function drawQR(){
@@ -2507,8 +2509,10 @@ function drawQR(){
 }
 function renderLobby(){
   const ids=Object.keys(players);
-  $("plist").innerHTML=ids.map(i=>`<li>${i===uid?"👉 ":"🙂 "}${esc(players[i].name)}</li>`).join("");
-  $("start").disabled=ids.length<2;
+  $("plist").innerHTML=ids.map(i=>`<li>${players[i].ready?"✅ ":(i===uid?"👉 ":"🙂 ")}${esc(players[i].name)}${players[i].ready?"　じゅんび OK":""}</li>`).join("");
+  const mine=!!(players[uid]&&players[uid].ready), all=ids.length>=2&&ids.every(i=>players[i].ready);
+  $("ready").textContent=mine?"じゅんび やめる":"じゅんび OK！";
+  $("start").disabled=!all;
 }
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 
